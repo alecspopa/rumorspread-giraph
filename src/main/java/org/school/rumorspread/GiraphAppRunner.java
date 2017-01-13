@@ -1,7 +1,5 @@
 package org.school.rumorspread;
 
-import java.io.File;
-
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.conf.GiraphConstants;
 import org.apache.giraph.io.formats.GiraphFileInputFormat;
