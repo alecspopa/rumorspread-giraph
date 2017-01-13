@@ -45,8 +45,8 @@ public class GiraphAppRunner implements Tool {
 
 	public int run(String[] args) throws Exception {
 		// input and output file path
-		setInputPath("/Users/alecspopa/Developer/school/dsap/giraph/maven_giraph/rumorspread-graph.txt");
-		setOutputPath("/Users/alecspopa/Developer/school/dsap/giraph/maven_giraph/rumorspread-output");
+		setInputPath(args[0]);
+		setOutputPath(args[1]);
 		
 		GiraphConfiguration giraphConf = new GiraphConfiguration(getConf());
 		

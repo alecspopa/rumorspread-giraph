@@ -13,18 +13,26 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Doubl
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
-	public static final int MAX_SUPERSTEPS = 1;
+	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
     public void compute(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
-		System.out.print("hello");
-		LOG.info("hello-log4j-hello");
+		LOG.info("==============================");
 		
 		// value of all other nodes
 		if (getSuperstep() >= 1) {
 			// set value of current vertex based on the computation
-			DoubleWritable thisVertexValue = computeVertexValueFromVertexMessages_Sample(vertex, messages);
-			vertex.setValue(thisVertexValue);
+			double sum = 0;
+			for (DoubleWritable message : messages) {
+				sum += message.get();
+			}
+
+			double vertexValue = 0.0;
+			if ((sum / vertex.getNumEdges()) >= 0.5) {
+				vertexValue = 1.0;
+			}
+			
+			vertex.getValue().set(vertexValue);
 		}
 		
 		// send current value to all edges		
@@ -35,32 +43,5 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Doubl
 			vertex.voteToHalt();
 		}
     }
-	
-	private DoubleWritable computeVertexValueFromVertexMessages_Sample(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex, Iterable<DoubleWritable> messages) {
-		double sum = 0;
-		for (DoubleWritable message : messages) {
-			sum += message.get();
-		}
 
-		double thisVertexValue = 0.0;
-		if ((sum / vertex.getNumEdges()) >= 0.5) {
-			thisVertexValue = 1.0;
-		}
-		
-		return new DoubleWritable(thisVertexValue);
-	}
-	
-	private DoubleWritable computeVertexValueFromVertexMessages_UnifiedModel(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex, Iterable<DoubleWritable> messages) {
-		double sum = 0;
-		for (DoubleWritable message : messages) {
-			sum += message.get();
-		}
-
-		double thisVertexValue = 0.0;
-		if ((sum / vertex.getNumEdges()) >= 0.5) {
-			thisVertexValue = 1.0;
-		}
-		
-		return new DoubleWritable(thisVertexValue);
-	}
 }
