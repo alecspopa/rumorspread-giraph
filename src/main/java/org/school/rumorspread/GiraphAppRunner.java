@@ -3,8 +3,6 @@ package org.school.rumorspread;
 import org.apache.giraph.conf.GiraphConfiguration;
 import org.apache.giraph.conf.GiraphConstants;
 import org.apache.giraph.io.formats.GiraphFileInputFormat;
-import org.apache.giraph.io.formats.IdWithValueTextOutputFormat;
-import org.apache.giraph.io.formats.JsonLongDoubleFloatDoubleVertexInputFormat;
 import org.apache.giraph.job.GiraphJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -51,11 +49,11 @@ public class GiraphAppRunner implements Tool {
 		GiraphConfiguration giraphConf = new GiraphConfiguration(getConf());
 		
 		giraphConf.setComputationClass(RumorSpreadComputation.class);
-		giraphConf.setVertexInputFormatClass(JsonLongDoubleFloatDoubleVertexInputFormat.class);
+		giraphConf.setVertexInputFormatClass(RumorSpreadInputFormat.class);
 		
 		GiraphFileInputFormat.addVertexInputPath(giraphConf, new Path(getInputPath()));
 		
-		giraphConf.setVertexOutputFormatClass(IdWithValueTextOutputFormat.class);
+		giraphConf.setVertexOutputFormatClass(RumorSpreadOutputFormat.class);
 		 
 		giraphConf.setWorkerConfiguration(0, 1, 100);
 		giraphConf.setLocalTestMode(true);

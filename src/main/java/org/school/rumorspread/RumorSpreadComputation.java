@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
-public class RumorSpreadComputation extends BasicComputation<LongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
+public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
@@ -17,7 +17,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Doubl
 	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
-    public void compute(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
+    public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
 		LOG.info("==============================");
 		
 		// value of all other nodes
@@ -33,12 +33,12 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Doubl
 				vertexValue = 1.0;
 			}
 			
-			vertex.getValue().set(vertexValue);
+			vertex.getValue().add(new DoubleWritable(vertexValue));
 		}
 		
 		// send current value to all edges		
 		if (getSuperstep() < MAX_SUPERSTEPS) {
-			DoubleWritable message = new DoubleWritable(vertex.getValue().get());
+			DoubleWritable message = vertex.getValue().getLastValue();
 			sendMessageToAllEdges(vertex, message);
 		} else {
 			vertex.voteToHalt();
