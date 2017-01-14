@@ -12,13 +12,25 @@ import java.io.IOException;
 public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
-	
+
+	public static final int TIME_MAX = 10;
 	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
 		LOG.info("==============================");
 		
+		// array to store time of infection of node
+		boolean[] infected = new boolean[TIME_MAX];
+		
+		// if vertex is infected at time 0 mark that
+		if (vertex.getValue().getLastValue().get() == 1.0) {
+			infected[0] = true;
+		}
+		
+		for (int t = 0; t < TIME_MAX; t++) {
+			rumorCascade(vertex, infected, t);
+		}
 		
 		// value of all other nodes
 		if (getSuperstep() >= 1) {
@@ -44,5 +56,9 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 			vertex.voteToHalt();
 		}
     }
+	
+	protected void rumorCascade(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, boolean[] infected, int t) {
+		
+	}
 
 }
