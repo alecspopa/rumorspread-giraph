@@ -8,8 +8,9 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Random;
 
-public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
+public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, RumorSpreadMessage> {
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
@@ -17,28 +18,55 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
-    public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
+    public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<RumorSpreadMessage> messages) throws IOException {
 		LOG.info("==============================");
 		
-		// value of all other nodes
 		if (getSuperstep() >= 1) {
-			// set value of current vertex based on the computation
-			double sum = 0;
-			for (DoubleWritable message : messages) {
-				sum += message.get();
-			}
-
-			double vertexValue = 0.0;
-			if ((sum / vertex.getNumEdges()) >= 0.5) {
-				vertexValue = 1.0;
+			double vertexValueForT = vertex.getValue().getLastValue().get();
+			
+			// if current vertex is infected it cannot be infected again
+			if (vertexValueForT != 1.0) {
+				/**
+				 *  At each time step t, each node is either infected or susceptible, 
+				 *  and every node v that was infected at time t − 1 has
+				 *  a single chance to infect each of its neighbors u.
+				 *  
+				 *  Messages are the values of the neighbors at t - 1
+				 */
+				for (RumorSpreadMessage message : messages) {
+					double valueOfNeighborAtTMinusOne = message.getValue();
+					
+					if (valueOfNeighborAtTMinusOne == 0.0) {
+						// neighbor was not infected at previous step it cannot infect
+						// continue to next neighbor
+						continue;
+					}
+					
+					/**
+					 * Then v would try to infect each of its outgoing neighbor, 
+					 * succeeding in doing so with probability p_v,u 
+					 * given by the element G_v,u of the adjacency matrix. 
+					 * The success of the event is simulated by generating a random number between 0 and 1, 
+					 * and checking if its value is less than the probability of success (G_v,u)
+					 * 
+					 * 
+					 */
+					LongWritable messageVertexId = new LongWritable(message.getVertexId());
+					float edgeValue = vertex.getEdgeValue(messageVertexId).get();
+					
+					double random = new Random().nextInt(11) / 10;
+					if (random < edgeValue) {
+						vertexValueForT = 1.0;
+					}
+				}
 			}
 			
-			vertex.getValue().add(new DoubleWritable(vertexValue));
+			vertex.getValue().add(new DoubleWritable(vertexValueForT));
 		}
 		
 		// send current value to all edges		
 		if (getSuperstep() < MAX_SUPERSTEPS) {
-			DoubleWritable message = vertex.getValue().getLastValue();
+			RumorSpreadMessage message = new RumorSpreadMessage(vertex.getId().get(), vertex.getValue().getLastValue().get());
 			sendMessageToAllEdges(vertex, message);
 		} else {
 			vertex.voteToHalt();
