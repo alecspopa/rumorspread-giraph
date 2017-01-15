@@ -13,6 +13,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Doubl
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
+	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
