@@ -20,20 +20,21 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
 		LOG.info("==============================");
 		
-		// array to store time of infection of node
-		boolean[] infected = new boolean[TIME_MAX];
-		
-		// if vertex is infected at time 0 mark that
-		if (vertex.getValue().getInfected().get() == 1.0) {
-			infected[0] = true;
-		}
-		
-		for (int t = 0; t < TIME_MAX; t++) {
-			rumorCascade(vertex, infected, t);
-		}
-		
 		// value of all other nodes
 		if (getSuperstep() >= 1) {
+			// array to store time of infection of node
+			boolean[] infected = new boolean[TIME_MAX];
+			
+			// if vertex is infected at time 0 mark that
+			if (vertex.getValue().getInfected().get() == 1.0) {
+				infected[0] = true;
+			}
+			
+			for (int t = 0; t < TIME_MAX; t++) {
+				rumorCascade(vertex, messages, infected, t);
+			}
+			
+			
 			// set value of current vertex based on the computation
 			double sum = 0;
 			for (DoubleWritable message : messages) {
@@ -56,8 +57,17 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		}
     }
 	
-	protected void rumorCascade(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, boolean[] infected, int t) {
-		
+	protected void rumorCascade(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages, boolean[] infected, int t) {
+		for (DoubleWritable message : messages) {
+			double neihborValueAtTMinus1 = message.get();
+			
+			// skip if not infected
+			if (neihborValueAtTMinus1 == 0.0) {
+				continue;
+			}
+			
+			
+		}
 	}
 
 }
