@@ -13,7 +13,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	
 	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 
-	public static final int TIME_MAX = 10;
+	public static final int TIME_MAX = 3;
 	public static final int MAX_SUPERSTEPS = 3;
 	
 	@Override
@@ -24,7 +24,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		boolean[] infected = new boolean[TIME_MAX];
 		
 		// if vertex is infected at time 0 mark that
-		if (vertex.getValue().getLastValue().get() == 1.0) {
+		if (vertex.getValue().getInfected().get() == 1.0) {
 			infected[0] = true;
 		}
 		
@@ -45,13 +45,12 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 				vertexValue = 1.0;
 			}
 			
-			vertex.getValue().add(new DoubleWritable(vertexValue));
+			vertex.getValue().setInfected(new DoubleWritable(vertexValue));
 		}
 		
 		// send current value to all edges		
 		if (getSuperstep() < MAX_SUPERSTEPS) {
-			DoubleWritable message = vertex.getValue().getLastValue();
-			sendMessageToAllEdges(vertex, message);
+			sendMessageToAllEdges(vertex, vertex.getValue().getInfected());
 		} else {
 			vertex.voteToHalt();
 		}

@@ -21,12 +21,13 @@ import com.google.common.collect.Lists;
  * File input sample (JSON format)
  * 
  * <code>long</code> vertexId
- * <code>double</code> vertexValuesX
- * <code>integer</code> vertexValuesLength
+ * <code>double</code> vertexValue
+ * <code>integer</code> TIME_MAX
+ * <code>double</code> infectedAtTimex
  * <code>long</code> destEdgeId
  * <code>double</code> destEdgeValue
  *
- * [vertexId, [vertexValuesLength, vertexValue1, vertexValue2, ...], [[destEdgeId, destEdgeValue], [destEdgeId, destEdgeValue], ...]]
+ * [vertexId, vertexValue, [TIME_MAX, infectedAtTime0, infectedAtTime1, ...], [[destEdgeId, destEdgeValue], [destEdgeId, destEdgeValue], ...]]
  */
 
 public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, RumorSpreadVertexValue, FloatWritable> {
@@ -51,19 +52,21 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 	
 		@Override
 		protected RumorSpreadVertexValue getValue(JSONArray jsonVertex) throws JSONException, IOException {
-			JSONArray jsonVertexValueArray = jsonVertex.getJSONArray(1);
-			List<DoubleWritable> values = Lists.newArrayListWithCapacity(jsonVertexValueArray.length());
+			DoubleWritable value = new DoubleWritable(jsonVertex.getDouble(1));
 			
-			for (int i = 0; i < jsonVertexValueArray.length(); ++i) {
-				values.add(new DoubleWritable(jsonVertexValueArray.getDouble(i)));
+			JSONArray jsonVertexValueArray = jsonVertex.getJSONArray(2);
+			DoubleWritable[] numberOfInfectedAtTimeT = new DoubleWritable[jsonVertexValueArray.length()];
+			
+			for (int i = 0; i < jsonVertexValueArray.length(); i++) {
+				numberOfInfectedAtTimeT[i] = new DoubleWritable(jsonVertexValueArray.getDouble(i));
 			}
 			
-			return new RumorSpreadVertexValue(values);
+			return new RumorSpreadVertexValue(value, numberOfInfectedAtTimeT);
 		}
 	
 		@Override
 		protected Iterable<Edge<LongWritable, FloatWritable>> getEdges(JSONArray jsonVertex) throws JSONException, IOException {
-			JSONArray jsonEdgeArray = jsonVertex.getJSONArray(2);
+			JSONArray jsonEdgeArray = jsonVertex.getJSONArray(3);
 			List<Edge<LongWritable, FloatWritable>> edges = Lists.newArrayListWithCapacity(jsonEdgeArray.length());
 		      
 			for (int i = 0; i < jsonEdgeArray.length(); ++i) {
