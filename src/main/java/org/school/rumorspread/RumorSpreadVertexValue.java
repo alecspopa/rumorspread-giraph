@@ -52,8 +52,26 @@ public class RumorSpreadVertexValue implements Writable {
 		values.add(value);
 	}
 	
+	public DoubleWritable getValueAtIndex(int t) {
+		return this.values.get(t);
+	}
+	
 	public DoubleWritable getLastValue() {
-		return this.values.get(this.values.size() - 1);
+		return getValueAtIndex(this.values.size() - 1);
+	}
+	
+	public double getValuesSum(int t) {
+		double sum = 0.0;
+		
+		for (int i = 0; i < t; i++) {
+			sum += values.get(i).get();
+	    }
+		
+		return sum;
+	}
+	
+	public double getValuesSum() {	
+		return getValuesSum(values.size());
 	}
 	
 	public String[] toStrings() {

@@ -8,7 +8,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, RumorSpreadMessage> {
 	
@@ -17,15 +16,25 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 3;
 	
+	// Rconstant in the MPI implementation
+	public static final double alpha = 0.02;
+	
+	public static final double beta = 6; 
+	
 	@Override
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<RumorSpreadMessage> messages) throws IOException {
 		LOG.info("==============================");
 		
 		if (getSuperstep() >= 1) {
-			double vertexValueForT = vertex.getValue().getLastValue().get();
+			double vertexValueForT_MinusOne = vertex.getValue().getLastValue().get();
+			double vertexValueForT = vertexValueForT_MinusOne;
 			
 			// if current vertex is infected it cannot be infected again
-			if (vertexValueForT != 1.0) {
+			if (vertexValueForT_MinusOne != 1.0) {
+				double prodOneMinusNeighborWeightsWithValues = 1.0;
+				double prodNeighborWeightsWithOneMinuxValues = 1.0;
+				double rut = Math.exp(alpha * vertex.getValue().getValuesSum() - beta);
+				
 				/**
 				 *  At each time step t, each node is either infected or susceptible, 
 				 *  and every node v that was infected at time t − 1 has
@@ -35,30 +44,19 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 				 */
 				for (RumorSpreadMessage message : messages) {
 					double valueOfNeighborAtTMinusOne = message.getValue();
-					
-					if (valueOfNeighborAtTMinusOne == 0.0) {
-						// neighbor was not infected at previous step it cannot infect
-						// continue to next neighbor
-						continue;
-					}
-					
+
 					/**
 					 * Then v would try to infect each of its outgoing neighbor, 
 					 * succeeding in doing so with probability p_v,u 
-					 * given by the element G_v,u of the adjacency matrix. 
-					 * The success of the event is simulated by generating a random number between 0 and 1, 
-					 * and checking if its value is less than the probability of success (G_v,u)
-					 * 
-					 * 
 					 */
 					LongWritable messageVertexId = new LongWritable(message.getVertexId());
 					float edgeValue = vertex.getEdgeValue(messageVertexId).get();
 					
-					double random = new Random().nextInt(11) / 10;
-					if (random < edgeValue) {
-						vertexValueForT = 1.0;
-					}
+					prodOneMinusNeighborWeightsWithValues *= (1 - edgeValue * valueOfNeighborAtTMinusOne);
+					prodNeighborWeightsWithOneMinuxValues *= edgeValue * (1 - valueOfNeighborAtTMinusOne);
 				}
+				
+				vertexValueForT = 1 - (1 - vertexValueForT_MinusOne) * prodOneMinusNeighborWeightsWithValues + prodNeighborWeightsWithOneMinuxValues * prodOneMinusRukMinusOnePlusPrevValue(vertex) * (1 - rut);
 			}
 			
 			vertex.getValue().add(new DoubleWritable(vertexValueForT));
@@ -72,5 +70,16 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 			vertex.voteToHalt();
 		}
     }
+	
+	private double prodOneMinusRukMinusOnePlusPrevValue(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex) {
+		double prod = 1.0;
+		
+		// size() contains t-1 values because the t value is added after this computation
+		for (int i = 1; i <= vertex.getValue().get().size(); i++) {
+			prod *= (1.0 - Math.exp(alpha * vertex.getValue().getValuesSum(i) - beta) - 1.0 + vertex.getValue().getValueAtIndex(i - 1).get());
+		}
+		
+		return prod;
+	}
 
 }
