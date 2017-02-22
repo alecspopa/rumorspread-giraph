@@ -5,13 +5,10 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, RumorSpreadMessage> {
-	
-	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
 	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 3;
@@ -23,7 +20,6 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	
 	@Override
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<RumorSpreadMessage> messages) throws IOException {
-		LOG.info("==============================");
 		
 		if (getSuperstep() >= 1) {
 			double vertexValueForT_MinusOne = vertex.getValue().getLastValue().get();
