@@ -13,7 +13,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 3;
 	
-	// Rconstant in the MPI implementation
+	// R_constant in the MPI implementation
 	public static final double alpha = 0.02;
 	
 	public static final double beta = 6; 
