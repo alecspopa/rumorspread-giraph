@@ -1,0 +1,10 @@
+.classpath
+.project
+.settings
+
+/target/
+
+_bsp
+
+log4j-application.log
+log4j-application.log.*

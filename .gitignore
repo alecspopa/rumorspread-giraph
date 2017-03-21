@@ -1,6 +1,10 @@
-/target/
+.DS_Store
 
-_bsp
+documentation/*
 
-log4j-application.log
-log4j-application.log.*
+datasets/*
+!datasets/.keep
+!datasets/rumorspread-graph.txt
+!datasets/process_twitter_mention.py
+
+output/*
