@@ -11,4 +11,5 @@ It will give an error about the runtime arguments in main, so go to Run -> Run C
 - the second one the output path for the result (ex: `../output`)
 
 *NOTE:* paths are relative to `org.school.rumorspread` directory
+
 *NOTE 2:* output directory must not exist and must be removed after each run
