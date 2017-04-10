@@ -4,7 +4,7 @@ documentation/*
 
 datasets/*
 !datasets/.keep
-!datasets/rumorspread-graph.txt
+!datasets/rumorspread-graph.json
 !datasets/process_twitter_mention.py
 
 output/*

@@ -22,11 +22,11 @@ for line in in_file:
 
     if node_id in nodes:
         nodes[node_id]['infected'] = node_infected
-        nodes[node_id]['neighbors'].append([words[1], edge_value])
+        nodes[node_id]['neighbors'].append([int(words[1]), edge_value])
     else:
         nodes[node_id] = dict(infected= node_infected, neighbors= [[int(words[1]), edge_value]])
 
-for key, value in nodes.iteritems():
+for key, value in nodes.items():
     node_output = [int(key), [1, value['infected']], value['neighbors']]
     out_file.write(json.dumps(node_output) + '\n')
 
