@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, RumorSpreadMessage> {
+public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
 	
 	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 3;
@@ -18,10 +18,16 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	// R_constant in the MPI implementation
 	public static final double alpha = 0.02;
 	
-	public static final double beta = 6; 
+	public static final double beta = 6;
+	
+	/**
+	 * V would try to infect each of its outgoing neighbor, 
+	 * succeeding in doing so with probability p_v,u 
+	 */
+	public static final double probOfInfection = 0.01;
 	
 	@Override
-    public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<RumorSpreadMessage> messages) throws IOException {
+    public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
 		
 		if (getSuperstep() >= 1) {
 			if (vertex.getValue().size() == 0) {
@@ -45,19 +51,11 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 				 *  
 				 *  Messages are the values of the neighbors at t - 1
 				 */
-				for (RumorSpreadMessage message : messages) {
-					double valueOfNeighborAtTMinusOne = message.getValue();
+				for (DoubleWritable message : messages) {
+					double valueOfNeighborAtTMinusOne = message.get();
 
-					/**
-					 * Then v would try to infect each of its outgoing neighbor, 
-					 * succeeding in doing so with probability p_v,u 
-					 */
-//					LongWritable messageVertexId = new LongWritable(message.getVertexId());
-//					float edgeValue = vertex.getEdgeValue(messageVertexId).get(); //NOTE: might be null
-					float edgeValue = (float) 0.01;
-					
-					prodOneMinusNeighborWeightsWithValues *= (1 - edgeValue * valueOfNeighborAtTMinusOne);
-					prodNeighborWeightsWithOneMinuxValues *= edgeValue * (1 - valueOfNeighborAtTMinusOne);
+					prodOneMinusNeighborWeightsWithValues *= (1 - probOfInfection * valueOfNeighborAtTMinusOne);
+					prodNeighborWeightsWithOneMinuxValues *= probOfInfection * (1 - valueOfNeighborAtTMinusOne);
 				}
 				
 				vertexValueForT = 1 - 
@@ -78,7 +76,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		
 		// send current value to all edges		
 		if (getSuperstep() < MAX_SUPERSTEPS) {
-			RumorSpreadMessage message = new RumorSpreadMessage(vertex.getId().get(), vertex.getValue().getLastValue().get());
+			DoubleWritable message = vertex.getValue().getLastValue();
 			sendMessageToAllEdges(vertex, message);
 		} else {
 			vertex.voteToHalt();
