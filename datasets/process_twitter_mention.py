@@ -28,7 +28,7 @@ for line in in_file:
 
 
 for key, value in nodes.items():
-    node_output = [int(key), [value['infected']], value['neighbors']]
+    node_output = [int(key), value['infected'], value['neighbors']]
     out_file.write(json.dumps(node_output) + '\n')
 
 in_file.close()

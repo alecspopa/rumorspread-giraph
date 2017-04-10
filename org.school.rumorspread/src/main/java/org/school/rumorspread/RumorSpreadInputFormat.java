@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
  * <code>long</code> destEdgeId
  * <code>double</code> destEdgeValue
  *
- * [vertexId, [vertexValuesLength, vertexValueAtT0, vertexValueAtT1, ...], [[destEdgeId, destEdgeValue], [destEdgeId, destEdgeValue], ...]]
+ * [vertexId, vertexValueAtT0, [[destEdgeId, destEdgeValue], [destEdgeId, destEdgeValue], ...]]
  */
 
 public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, RumorSpreadVertexValue, FloatWritable> {
@@ -51,12 +51,9 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 	
 		@Override
 		protected RumorSpreadVertexValue getValue(JSONArray jsonVertex) throws JSONException, IOException {
-			JSONArray jsonVertexValueArray = jsonVertex.getJSONArray(1);
-			List<DoubleWritable> values = Lists.newArrayListWithCapacity(jsonVertexValueArray.length());
-			
-			for (int i = 0; i < jsonVertexValueArray.length(); ++i) {
-				values.add(new DoubleWritable(jsonVertexValueArray.getDouble(i)));
-			}
+			List<DoubleWritable> values = Lists.newArrayListWithCapacity(1);
+
+			values.add(new DoubleWritable(jsonVertex.getDouble(1)));
 			
 			return new RumorSpreadVertexValue(values);
 		}

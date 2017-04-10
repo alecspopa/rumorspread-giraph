@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableFactories;
 
 public class RumorSpreadVertexValue implements Writable {
 
@@ -24,19 +23,20 @@ public class RumorSpreadVertexValue implements Writable {
 	public void readFields(DataInput in) throws IOException {
 		this.values = new ArrayList<DoubleWritable>();
 		
+		Double value;
 		int length = in.readInt();
+		
 		for (int i = 0; i < length; i++) {
-			Writable value = WritableFactories.newInstance(DoubleWritable.class);
-		    value.readFields(in);
-		    
-			this.values.add((DoubleWritable) value);
+			value = in.readDouble();
+			this.values.add(new DoubleWritable(value));
 		}
 	}
 
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(values.size());
+		
 		for (int i = 0; i < values.size(); i++) {
-			values.get(i).write(out);
+			out.writeDouble(values.get(i).get());
 		}
 	}
 	
