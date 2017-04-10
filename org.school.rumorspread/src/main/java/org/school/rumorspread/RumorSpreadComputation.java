@@ -24,6 +24,11 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<RumorSpreadMessage> messages) throws IOException {
 		
 		if (getSuperstep() >= 1) {
+			if (vertex.getValue().size() == 0) {
+				// Avoid computing for Vertex initialized with empty constructor
+				return;
+			}
+			
 			double vertexValueForT_MinusOne = vertex.getValue().getLastValue().get();
 			double vertexValueForT = vertexValueForT_MinusOne;
 			
@@ -47,8 +52,9 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 					 * Then v would try to infect each of its outgoing neighbor, 
 					 * succeeding in doing so with probability p_v,u 
 					 */
-					LongWritable messageVertexId = new LongWritable(message.getVertexId());
-					float edgeValue = vertex.getEdgeValue(messageVertexId).get();
+//					LongWritable messageVertexId = new LongWritable(message.getVertexId());
+//					float edgeValue = vertex.getEdgeValue(messageVertexId).get(); //NOTE: might be null
+					float edgeValue = (float) 0.01;
 					
 					prodOneMinusNeighborWeightsWithValues *= (1 - edgeValue * valueOfNeighborAtTMinusOne);
 					prodNeighborWeightsWithOneMinuxValues *= edgeValue * (1 - valueOfNeighborAtTMinusOne);
@@ -83,8 +89,8 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		double prod = 1.0;
 		
 		// size() contains t-1 values because the t value is added after this computation
-		for (int i = 1; i <= vertex.getValue().get().size(); i++) {
-			prod *= (1.0 - Math.exp(alpha * vertex.getValue().getValuesSum(i) - beta) - 1.0 + vertex.getValue().getValueAtIndex(i - 1).get());
+		for (int i = 1; i <= vertex.getValue().size(); i++) {
+			prod *= (1.0 - Math.exp(alpha * vertex.getValue().getValuesSum(i) - beta) - 1.0 + vertex.getValue().get(i - 1).get());
 		}
 		
 		return prod;

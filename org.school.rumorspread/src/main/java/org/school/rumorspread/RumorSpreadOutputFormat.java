@@ -1,6 +1,7 @@
 package org.school.rumorspread;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.formats.TextVertexOutputFormat;
@@ -31,9 +32,12 @@ public class RumorSpreadOutputFormat<I extends WritableComparable, V extends Rum
 			json.put(Integer.parseInt(vertexIdStr));
 
 			JSONArray valuesJson = new JSONArray();
-			for (DoubleWritable value : vertex.getValue().get()) {
+			
+			Iterator<DoubleWritable> itr = vertex.getValue().iterator();
+			
+			while (itr.hasNext()) {
 				try {
-					valuesJson.put(value.get());
+					valuesJson.put(itr.next().get());
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

@@ -1,7 +1,7 @@
 package org.school.rumorspread;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
@@ -31,9 +31,9 @@ import com.google.common.collect.Lists;
 
 public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, RumorSpreadVertexValue, FloatWritable> {
 
-	
 	@Override
-	public TextVertexInputFormat<LongWritable, RumorSpreadVertexValue, FloatWritable>.TextVertexReader createVertexReader(InputSplit split, TaskAttemptContext context) throws IOException {
+	public TextVertexInputFormat<LongWritable, RumorSpreadVertexValue, FloatWritable>.TextVertexReader createVertexReader(
+			InputSplit split, TaskAttemptContext context) throws IOException {
 		return new RumorSpreadVertexReader();
 	}
 	
@@ -51,7 +51,7 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 	
 		@Override
 		protected RumorSpreadVertexValue getValue(JSONArray jsonVertex) throws JSONException, IOException {
-			List<DoubleWritable> values = Lists.newArrayListWithCapacity(1);
+			ArrayList<DoubleWritable> values = Lists.newArrayListWithCapacity(1);
 
 			values.add(new DoubleWritable(jsonVertex.getDouble(1)));
 			
@@ -61,7 +61,7 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 		@Override
 		protected Iterable<Edge<LongWritable, FloatWritable>> getEdges(JSONArray jsonVertex) throws JSONException, IOException {
 			JSONArray jsonEdgeArray = jsonVertex.getJSONArray(2);
-			List<Edge<LongWritable, FloatWritable>> edges = Lists.newArrayListWithCapacity(jsonEdgeArray.length());
+			ArrayList<Edge<LongWritable, FloatWritable>> edges = Lists.newArrayListWithCapacity(jsonEdgeArray.length());
 		      
 			for (int i = 0; i < jsonEdgeArray.length(); ++i) {
 				JSONArray jsonEdge = jsonEdgeArray.getJSONArray(i);
@@ -72,5 +72,4 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 			return edges;
 		}
 	}
-	
 }

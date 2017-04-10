@@ -1,85 +1,54 @@
 package org.school.rumorspread;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
+import org.apache.giraph.utils.ArrayListWritable;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.Writable;
 
-public class RumorSpreadVertexValue implements Writable {
+public class RumorSpreadVertexValue extends ArrayListWritable<DoubleWritable> {
 
-	private List<DoubleWritable> values;
+	private static final long serialVersionUID = 227809916468865164L;
 
 	public RumorSpreadVertexValue() {
 	}
-	  
-	public RumorSpreadVertexValue(List<DoubleWritable> values) {
-		set(values);
+	
+	public RumorSpreadVertexValue(ArrayList<DoubleWritable> values) {
+		this.clear();
+		this.addAll(values);
 	}
 	
-	public void readFields(DataInput in) throws IOException {
-		this.values = new ArrayList<DoubleWritable>();
-		
-		Double value;
-		int length = in.readInt();
-		
-		for (int i = 0; i < length; i++) {
-			value = in.readDouble();
-			this.values.add(new DoubleWritable(value));
-		}
+	@Override
+	public void setClass() {
+		setClass(DoubleWritable.class);
 	}
 
-	public void write(DataOutput out) throws IOException {
-		out.writeInt(values.size());
-		
-		for (int i = 0; i < values.size(); i++) {
-			out.writeDouble(values.get(i).get());
-		}
-	}
-	
-	public void set(List<DoubleWritable> values) { 
-		this.values = values; 
-	}
-	
-	public List<DoubleWritable> get() { 
-		return values; 
-	}
-	
-	public void add(DoubleWritable value) {
-		values.add(value);
-	}
-	
-	public DoubleWritable getValueAtIndex(int t) {
-		return this.values.get(t);
-	}
-	
 	public DoubleWritable getLastValue() {
-		return getValueAtIndex(this.values.size() - 1);
+		return this.get(this.size() - 1);
+	}
+	
+	public double getValuesSum() {	
+		return getValuesSum(this.size());
 	}
 	
 	public double getValuesSum(int t) {
 		double sum = 0.0;
 		
-		for (int i = 0; i < t; i++) {
-			sum += values.get(i).get();
-	    }
+		Iterator<DoubleWritable> itr = this.iterator();
+		for (int i = 0; i < t && i < this.size() && itr.hasNext(); i++) {
+			sum +=  itr.next().get();
+		}
 		
 		return sum;
 	}
 	
-	public double getValuesSum() {	
-		return getValuesSum(values.size());
-	}
-	
 	public String[] toStrings() {
-		String[] strings = new String[values.size()];
-	    
-		for (int i = 0; i < values.size(); i++) {
-			strings[i] = values.get(i).toString();
-	    }
+		String[] strings = new String[this.size()];
+		
+		Iterator<DoubleWritable> itr = this.iterator();
+		for (int i = 0; i < this.size() && itr.hasNext(); i++) {
+			strings[i] = itr.next().toString();
+		}
 		
 	    return strings;
 	}
@@ -87,5 +56,4 @@ public class RumorSpreadVertexValue implements Writable {
 	public String toString() {
 		return String.join(" ", toStrings());
 	}
-
 }
