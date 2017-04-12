@@ -86,26 +86,24 @@
 
     <https://www.digitalocean.com/community/tutorials/how-to-create-a-cluster-of-docker-containers-with-docker-swarm-and-digitalocean-on-ubuntu-16-04>
 
-    docker-machine create \
-        --driver digitalocean \
-        --digitalocean-image ubuntu-16-04-x64 \
-        --digitalocean-size 1gb \
-        --digitalocean-region fra1 \
-        --digitalocean-private-networking true \
-        --digitalocean-userdata ./digitalocean-namenode-userdata.yml \
-        --digitalocean-ssh-key-fingerprint 20:e3:41:d8:bb:ce:5f:0b:43:99:3e:a9:1e:41:8b:f2 \
-        --digitalocean-access-token $DO_SWARM_TOKEN \
+    docker-machine create -d digitalocean \
+        --digitalocean-access-token="$DIGITALOCEAN_ACCESS_TOKEN" \
+        --digitalocean-image="ubuntu-16-04-x64" \
+        --digitalocean-size="1gb" \
+        --digitalocean-region="fra1" \
+        --digitalocean-private-networking=true \
+        --digitalocean-ssh-key-fingerprint="20:e3:41:d8:bb:ce:5f:0b:43:99:3e:a9:1e:41:8b:f2" \
+        --digitalocean-userdata=./digitalocean-namenode-userdata.yml \
         namenode
 
-    docker-machine create \
-        --driver digitalocean \
-        --digitalocean-image ubuntu-16-04-x64 \
-        --digitalocean-size 1gb \
-        --digitalocean-region fra1 \
-        --digitalocean-private-networking true \
-        --digitalocean-userdata ./digitalocean-datanode-userdata.yml \
-        --digitalocean-ssh-key-fingerprint 20:e3:41:d8:bb:ce:5f:0b:43:99:3e:a9:1e:41:8b:f2 \
-        --digitalocean-access-token $DO_SWARM_TOKEN \
+    docker-machine create -d digitalocean \
+        --digitalocean-access-token="$DIGITALOCEAN_ACCESS_TOKEN" \
+        --digitalocean-image="ubuntu-16-04-x64" \
+        --digitalocean-size="1gb" \
+        --digitalocean-region="fra1" \
+        --digitalocean-private-networking=true \
+        --digitalocean-ssh-key-fingerprint="20:e3:41:d8:bb:ce:5f:0b:43:99:3e:a9:1e:41:8b:f2" \
+        --digitalocean-userdata=./digitalocean-datanode-userdata.yml \
         datanode-1
 
     docker-machine ls
