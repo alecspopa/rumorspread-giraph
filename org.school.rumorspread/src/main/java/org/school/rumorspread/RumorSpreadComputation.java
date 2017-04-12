@@ -13,7 +13,7 @@ import java.math.RoundingMode;
 public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
 	
 	// think of this as T_max
-	public static final int MAX_SUPERSTEPS = 3;
+	public static final int MAX_SUPERSTEPS = 28;
 	
 	// R_constant in the MPI implementation
 	public static final double alpha = 0.02;
