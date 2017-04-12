@@ -45,7 +45,7 @@ RUN apt-get update && \
 
 # Overwrite default HADOOP configuration files with our config files
 COPY conf           $HADOOP_HOME/etc/hadoop/
-RUN chown root:root $HADOOP_HOME/etc/hadoop/*
+RUN chown root:root $HADOOP_HOME/etc/hadoop/* && \
     chmod 700 $HADOOP_HOME/etc/hadoop/*
 
 # Giraph
