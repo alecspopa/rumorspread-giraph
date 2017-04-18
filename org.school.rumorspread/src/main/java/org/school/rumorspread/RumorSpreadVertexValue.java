@@ -3,6 +3,7 @@ package org.school.rumorspread;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.giraph.utils.ArrayListWritable;
 import org.apache.hadoop.io.DoubleWritable;
 
@@ -54,6 +55,6 @@ public class RumorSpreadVertexValue extends ArrayListWritable<DoubleWritable> {
 	}
 	
 	public String toString() {
-		return String.join(" ", toStrings());
+		return StringUtils.join(this.toStrings(), " ");
 	}
 }
