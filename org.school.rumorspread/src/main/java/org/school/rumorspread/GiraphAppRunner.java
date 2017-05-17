@@ -66,9 +66,7 @@ public class GiraphAppRunner implements Tool {
 		
 		FileOutputFormat.setOutputPath(job.getInternalJob(), new Path(getOutputPath()));
 		
-		job.run(true);
-		
-		return 1;
+		return job.run(true) ? 0 : -1;
 	}
 	
 	public static void main(String[] args) throws Exception {
