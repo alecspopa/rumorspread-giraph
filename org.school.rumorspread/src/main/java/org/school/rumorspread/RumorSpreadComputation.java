@@ -82,7 +82,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		}
 		
 		// send current value to all edges		
-		if (getSuperstep() < MAX_SUPERSTEPS) {
+		if (getSuperstep() < MAX_SUPERSTEPS && vertex.getValue().size() == 0) {
 			DoubleWritable message = vertex.getValue().getLastValue();
 			sendMessageToAllEdges(vertex, message);
 		} else {
