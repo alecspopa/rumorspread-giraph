@@ -48,7 +48,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 			// if current vertex is infected it cannot be infected again
 			if (vertexValueForT_MinusOne != 1.0) {
 				double prodOneMinusNeighborWeightsWithValues = 1.0;
-				double prodNeighborWeightsWithOneMinuxValues = 1.0;
+				double prodNeighborWeightsWithOneMinusValues = 1.0;
 				double rut = Math.exp(alpha * vertex.getValue().getValuesSum() - beta);
 				
 				/**
@@ -62,14 +62,14 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 					double valueOfNeighborAtTMinusOne = message.get();
 
 					prodOneMinusNeighborWeightsWithValues *= (1 - probOfInfection * valueOfNeighborAtTMinusOne);
-					prodNeighborWeightsWithOneMinuxValues *= probOfInfection * (1 - valueOfNeighborAtTMinusOne);
+					prodNeighborWeightsWithOneMinusValues *= probOfInfection * (1 - valueOfNeighborAtTMinusOne);
 				}
 				
 				vertexValueForT = 1 - 
-						(1 - vertexValueForT_MinusOne) * 
+						((1 - vertexValueForT_MinusOne) * 
 						prodOneMinusNeighborWeightsWithValues + 
-						prodNeighborWeightsWithOneMinuxValues * 
-						prodOneMinusRukMinusOnePlusPrevValue(vertex) *
+						prodNeighborWeightsWithOneMinusValues * 
+						prodOneMinusRukMinusOnePlusPrevValue(vertex)) *
 						(1 - rut);
 				
 				// truncate value for vertex to 3 decimals				
