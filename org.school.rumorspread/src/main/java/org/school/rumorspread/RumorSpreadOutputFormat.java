@@ -10,12 +10,15 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 @SuppressWarnings("rawtypes")
 public class RumorSpreadOutputFormat<I extends WritableComparable, V extends RumorSpreadVertexValue, E extends Writable> 
 	extends TextVertexOutputFormat<I, V, E> {
+	
+	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 
 	@Override
 	public TextVertexWriter createVertexWriter(TaskAttemptContext context) {
@@ -39,7 +42,13 @@ public class RumorSpreadOutputFormat<I extends WritableComparable, V extends Rum
 				try {
 					valuesJson.put(itr.next().get());
 				} catch (JSONException e) {
+					LOG.info("==============================");
+					LOG.info(String.format("Bad vertex value for verted id: %s", vertex.getId().toString()));
+					LOG.info("==============================");
+					
 					e.printStackTrace();
+					
+					LOG.info("==============================");
 				}
 			}
 			

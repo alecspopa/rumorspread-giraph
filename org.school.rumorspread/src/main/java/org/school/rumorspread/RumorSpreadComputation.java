@@ -5,15 +5,12 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class RumorSpreadComputation extends BasicComputation<LongWritable, RumorSpreadVertexValue, FloatWritable, DoubleWritable> {
-	
-	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
 	
 	// think of this as T_max
 	public static final int MAX_SUPERSTEPS = 28;
@@ -31,10 +28,6 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 	
 	@Override
     public void compute(Vertex<LongWritable, RumorSpreadVertexValue, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
-		
-		LOG.info("==============================");
-		LOG.info(String.format("Processing verted id: %d", vertex.getId().get()));
-		LOG.info("==============================");
 		
 		if (getSuperstep() >= 1) {
 			if (vertex.getValue().size() == 0) {
@@ -82,7 +75,7 @@ public class RumorSpreadComputation extends BasicComputation<LongWritable, Rumor
 		}
 		
 		// send current value to all edges		
-		if (getSuperstep() < MAX_SUPERSTEPS && vertex.getValue().size() == 0) {
+		if (getSuperstep() < MAX_SUPERSTEPS && vertex.getValue().size() > 0) {
 			DoubleWritable message = vertex.getValue().getLastValue();
 			sendMessageToAllEdges(vertex, message);
 		} else {

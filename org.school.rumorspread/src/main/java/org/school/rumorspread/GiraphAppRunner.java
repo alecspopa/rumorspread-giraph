@@ -9,13 +9,17 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Logger;
 
 public class GiraphAppRunner implements Tool {
 
+	private static final Logger LOG = Logger.getLogger(RumorSpreadComputation.class);
+	
 	private Configuration conf;
 	
 	private String inputPath;
 	private String outputPath;
+	private Integer noWorkers;
 	
 	public String getInputPath() {
 		return inputPath;
@@ -33,6 +37,14 @@ public class GiraphAppRunner implements Tool {
 		this.outputPath = outputPath;
 	}
 	
+	public Integer getNoWorkers() {
+		return noWorkers;
+	}
+
+	public void setNoWorkers(Integer noWorkers) {
+		this.noWorkers = noWorkers;
+	}
+	
 	public Configuration getConf() {
 		return conf;
 	}
@@ -45,6 +57,7 @@ public class GiraphAppRunner implements Tool {
 		// input and output file path
 		setInputPath(args[0]);
 		setOutputPath(args[1]);
+		setNoWorkers(Integer.parseInt(args[2]));
 		
 		GiraphConfiguration giraphConf = new GiraphConfiguration(getConf());
 		
@@ -55,7 +68,7 @@ public class GiraphAppRunner implements Tool {
 		
 		giraphConf.setVertexOutputFormatClass(RumorSpreadOutputFormat.class);
 		 
-		giraphConf.setWorkerConfiguration(0, 1, 100);
+		giraphConf.setWorkerConfiguration(0, getNoWorkers(), 100);
 		giraphConf.setLocalTestMode(true);
 		giraphConf.setMaxNumberOfSupersteps(RumorSpreadComputation.MAX_SUPERSTEPS);
 		
@@ -65,6 +78,10 @@ public class GiraphAppRunner implements Tool {
 		GiraphJob job = new GiraphJob(giraphConf, getClass().getName());
 		
 		FileOutputFormat.setOutputPath(job.getInternalJob(), new Path(getOutputPath()));
+		
+		LOG.info("==============================");
+		LOG.info("Starting computation");
+		LOG.info("==============================");
 		
 		return job.run(true) ? 0 : -1;
 	}
