@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.formats.TextVertexOutputFormat;
-import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
@@ -36,7 +36,7 @@ public class RumorSpreadOutputFormat<I extends WritableComparable, V extends Rum
 
 			JSONArray valuesJson = new JSONArray();
 			
-			Iterator<DoubleWritable> itr = vertex.getValue().iterator();
+			Iterator<FloatWritable> itr = vertex.getValue().iterator();
 			
 			while (itr.hasNext()) {
 				try {

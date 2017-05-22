@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
 import org.apache.giraph.io.formats.TextVertexInputFormat;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -51,9 +50,9 @@ public class RumorSpreadInputFormat extends TextVertexInputFormat<LongWritable, 
 	
 		@Override
 		protected RumorSpreadVertexValue getValue(JSONArray jsonVertex) throws JSONException, IOException {
-			ArrayList<DoubleWritable> values = Lists.newArrayListWithCapacity(1);
+			ArrayList<FloatWritable> values = Lists.newArrayListWithExpectedSize(RumorSpreadComputation.MAX_SUPERSTEPS);
 
-			values.add(new DoubleWritable(jsonVertex.getDouble(1)));
+			values.add(new FloatWritable((float) jsonVertex.getDouble(1)));
 			
 			return new RumorSpreadVertexValue(values);
 		}
