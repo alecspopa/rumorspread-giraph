@@ -107,6 +107,7 @@ public class GiraphAppRunner implements Tool {
 		
 		GiraphConstants.SPLIT_MASTER_WORKER.set(giraphConf, !getIsLocalRun());
 		GiraphConstants.USE_OUT_OF_CORE_GRAPH.set(giraphConf, true);
+		GiraphConstants.METRICS_ENABLE.set(giraphConf, true);
 		
 		GiraphJob job = new GiraphJob(giraphConf, getClass().getName());
 		
