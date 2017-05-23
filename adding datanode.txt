@@ -1,0 +1,24 @@
+adding datanode:
+
+add entry in all zookeper config:
+nano zookeeper/conf/zoo.cnf
+
+server.1=namenode:2888:3888
+server.2=datanode:2888:3888
+server.3=datanode1:2888:3888
+server.4=datanode2:2888:3888
+server.5=datanode3:2888:3888
+server.6=datanode4:2888:3888
+server.7=datanode5:2888:3888
+server.8=datanode6:2888:3888
+server.9=datanode7:2888:3888
+
+
+add entry in namenodes slave file:
+nano hadoop/etc/hadoop/slaves
+
+on each node:
+rm -rf hadoop/hadoop-data
+
+format data:
+hdfs namenode -format

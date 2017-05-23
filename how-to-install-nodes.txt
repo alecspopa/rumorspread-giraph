@@ -1,0 +1,121 @@
+sudo add-apt-repository -y ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get -y install oracle-java7-installer
+sudo update-java-alternatives -s java-7-oracle
+sudo iptables -I INPUT -j ACCEPT
+sudo addgroup hadoopgroup
+sudo adduser --ingroup hadoopgroup hadoopuser
+sudo apt-get -y install maven
+sudo apt-get -y install htop
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+ sudo mkswap /swapfile
+ sudo swapon /swapfile
+sudo nano /etc/fstab
+/swapfile   none    swap    sw    0   0
+//sudo apt-get -y install xinetd telnetd
+su - hadoopuser
+parola
+ssh-keygen -t rsa -P ""
+cat /home/hadoopuser/.ssh/id_rsa.pub >> /home/hadoopuser/.ssh/authorized_keys
+(copiem key-urile intre ele)
+wget https://dist.apache.org/repos/dist/release/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
+tar xvf hadoop-2.7.1.tar.gz
+mv hadoop-2.7.1 hadoop
+nano ~/.bashrc
+export HADOOP_HOME=/home/hadoopuser/hadoop
+export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+export GIRAPH_HOME=/home/hadoopuser/giraph
+
+source ~/.bashrc
+cd $HADOOP_HOME
+nano etc/hadoop/hadoop-env.sh
+replace export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+nano etc/hadoop/core-site.xml
+<configuration>
+        <property>
+                <name>hadoop.tmp.dir</name>
+                <value>/home/hadoopuser/tmp</value>
+                <description>Temporary Directory.</description>
+        </property>
+
+        <property>
+                <name>fs.defaultFS</name>
+                <value>hdfs://namenode</value>
+                <description>Use HDFS as file storage engine</description>
+        </property>
+</configuration>
+
+nano etc/hadoop/hdfs-site.xml
+
+<configuration>
+        <property>
+                <name>dfs.replication</name>
+                <value>2</value>
+                <description>Default block replication.The actual number of replications can be specified when the file is created.The default is used if replication is not specified in create time.</description>
+        </property>
+
+        <property>
+                <name>dfs.namenode.name.dir</name>
+                <value>/home/hadoopuser/hadoop/hadoop-data/hadoopuser/hdfs/namenode</value>
+                <description>Determines where on the local filesystem the DFS name node should store the name table(fsimage). If this is a comma-delimited list of directories then the name table is replicated in all of the directories, for redundancy.</description>
+        </property>
+
+        <property>
+                <name>dfs.datanode.data.dir</name>
+                <value>/home/hadoopuser/hadoop/hadoop-data/hadoopuser/hdfs/datanode</value>
+                <description>Determines where on the local filesystem an DFS data node should store its blocks. If this is a comma-delimited list of directories, then data will be stored in all named directories, typically on different devices. Directories that do not exist are ignored.</description>
+        </property>
+</configuration>
+
+nano etc/hadoop/yarn-site.xml
+
+<configuration>
+
+        <property>
+                <name>yarn.nodemanager.aux-services</name>
+                <value>mapreduce_shuffle</value>
+        </property>
+
+        <property>
+                <name>yarn.resourcemanager.scheduler.address</name>
+                <value>namenode:8030</value>
+        </property> 
+
+        <property>
+                <name>yarn.resourcemanager.address</name>
+                <value>namenode:8032</value>
+        </property>
+
+        <property>
+                <name>yarn.resourcemanager.webapp.address</name>
+                <value>namenode:8088</value>
+        </property>
+
+        <property>
+                <name>yarn.resourcemanager.resource-tracker.address</name>
+                <value>namenode:8031</value>
+        </property>
+
+        <property>
+                <name>yarn.resourcemanager.admin.address</name>
+                <value>namenode:8033</value>
+        </property>
+
+</configuration>
+
+cd ~
+
+git clone https://github.com/apache/giraph.git
+
+cd ./giraph/
+ nano pom.xml
+search for :
+<hadoop.version>SET_HADOOP_VERSION_USING_MVN_DASH_D_OPTION</hadoop.version>
+and replace:
+<munge.symbols>PURE_YARN,STATIC_SASL_SYMBOL</munge.symbols>
+into this:
+<munge.symbols>PURE_YARN</munge.symbols>
+ mvn -Phadoop_yarn -Dhadoop.version=2.7.1 -DskipTests package
+
