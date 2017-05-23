@@ -6,5 +6,6 @@ datasets/*
 !datasets/.keep
 !datasets/rumorspread-graph.json
 !datasets/process_twitter_mention.py
+!datasets/process_hept.py
 
 output/*
